@@ -1,0 +1,33 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.container-layout{
+    max-width: 900px;
+}
+
+.img-thumbnail{
+    max-width: 60px;
+}
+
+.chat-box{
+    min-height: 350px;
+    max-height: 350px;
+}
+
+.timestamp{
+    color:brown;
+}
+
+/*Ocultar flechas Input Number*/
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}

@@ -1,0 +1,14 @@
+<h3 class="container mt-3 mb-3 ">Centro de Mensajes</h3>
+<div class="container">
+    <form onsubmit="return addMsg(this)">
+        <input class="form-control my-2" type="email" id="email" placeholder="nombre@mail.com" required>
+        <div class="container border chat-box overflow-auto" id="mensajes"></div>
+        <div class="d-flex">
+        <input class="form-control my-2 me-2" type="text" id="mensaje" placeholder="Ingresá un mensaje..." required>
+        <button class="btn btn-primary my-2">ENVIAR</button>
+        </div>
+    </form>
+</div>
+<div class="container mt-3">
+    <a href="/api/productos-test" class="btn btn-success">Ver Productos</a>
+</div>
