@@ -1,4 +1,4 @@
-import ContenedorArchivos from "../../containers/ContenedorArchivos.js";
+import {ContenedorArchivos} from "../../containers/ContenedorArchivos.js";
 
 class MensajesDaoArchivos extends ContenedorArchivos {
 
@@ -6,7 +6,7 @@ class MensajesDaoArchivos extends ContenedorArchivos {
         super('./db/mensajes.json');
     };
 
-    async guardar(chat = {author: [], text: [] }){
+    async guardar(chat = {author: {}, text: {} }){
         return super.guardar(chat);
     };
 };

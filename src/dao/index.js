@@ -8,17 +8,17 @@ switch (process.env.PERS) {
     case 'mongoDb':
         const { default: MensajesDaoMongoDb } = await import ('./mensajes/MensajesDaoMongoDb.js');
         
-        productosDao = new MensajesDaoMongoDb();
+        mensajesDao = new MensajesDaoMongoDb();
         break;
     case 'firebase':
         const { default: MensajesDaosFirebase } = await import ('./mensajes/MensajesDaoFirebase.js');
         
-        productosDao = new MensajesDaosFirebase();
+        mensajesDao = new MensajesDaosFirebase();
         break;
     default:
         const {default: MensajesDaoMemoria } = await import ('./mensajes/MensajesDaoArchivos.js');
         
-        productosDao = new MensajesDaoMemoria();
+        mensajesDao = new MensajesDaoMemoria();
         break;
 };
 

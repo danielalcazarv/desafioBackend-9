@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config()
 import path from 'path';
 import {fileURLToPath} from 'url';
+const firebaseKey = JSON.parse(process.env.FIRESTORE_JSON_KEY);
 
 //Solucion a __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -19,7 +20,7 @@ export default {
             serverSelectionTimeoutMS: 5000,
         }
     },
-    firebase: process.env.FIRESTORE_JSON_KEY,
+    firebase: firebaseKey,
     mariaDb: {
         db: {
             client: 'mysql',

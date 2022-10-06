@@ -4,8 +4,8 @@ class MensajesDaoMongoDb extends ContenedorMongoDb {
 
     constructor(){
         super('mensajes',{
-            author: {type: Array, required: true, default:[]},
-            text: {type: Array, required: true, default:[]}
+            author: {type: Object, required: true},
+            text: {type: Object, required: true}
         })
     };
 };

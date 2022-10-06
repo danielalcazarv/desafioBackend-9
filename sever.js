@@ -6,9 +6,9 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import morgan from 'morgan';
 import handlebars from 'express-handlebars';
+const apiProductos = new ProductoMock();
 import { ProductoMock } from './src/mocks/producto.mock.js';
-
-
+import { mensajesDao as mensajesApi } from './src/dao/index.js';
 
 //Solucion a __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -42,7 +42,6 @@ app.get('/', (req,res)=>{
 });
 
 app.get('/api/productos-test', (req,res)=>{
-    const apiProductos = new ProductoMock();
     const productos = apiProductos.almacenar(apiProductos.generarProducto())
     res.render('main', {test:true , api:productos})
 });
@@ -55,3 +54,14 @@ const server = httpServer.listen(PORT, ()=>{
 
 /******Web Socket******/
 
+//Chat
+io.on('connection', async (socket)=>{
+    const chat = await mensajesApi.listarAll();
+    
+    socket.emit('mensajes',chat);
+    
+    socket.on('new-mensaje', data =>{
+        mensajesApi.guardar(data);
+        io.sockets.emit('mensajes', chat);
+    });
+})

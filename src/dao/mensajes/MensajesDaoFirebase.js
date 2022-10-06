@@ -6,7 +6,7 @@ class MensajesDaoFirebase extends ContenedorFirebase {
         super('mensajes')
     };
 
-    async guardar(chat ={author: [], text: [] } ) {
+    async guardar(chat ={author: {}, text: {} } ) {
         return super.guardar(chat)
     };
 };
