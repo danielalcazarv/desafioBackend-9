@@ -22,6 +22,7 @@ const io = new Server (httpServer);
 /******Middleware******/
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('./public'));
+app.use('/api', express.static('./public'));
 app.use(morgan('dev'));
 
 //Motores de plantillas
