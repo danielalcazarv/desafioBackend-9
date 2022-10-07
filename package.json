@@ -17,6 +17,7 @@
     "firebase-admin": "^11.0.1",
     "mongoose": "^6.6.5",
     "nodemon": "^2.0.20",
+    "normalizr": "^3.6.2",
     "socket.io": "^4.5.2"
   },
   "type": "module",

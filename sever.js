@@ -9,6 +9,8 @@ import handlebars from 'express-handlebars';
 const apiProductos = new ProductoMock();
 import { ProductoMock } from './src/mocks/producto.mock.js';
 import { mensajesDao as mensajesApi } from './src/dao/index.js';
+import { schema, normalize } from 'normalizr'
+//import util from 'util';//borrar
 
 //Solucion a __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -18,6 +20,14 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const httpServer = createServer(app);
 const io = new Server (httpServer);
+
+/****Normalizr*****/
+//Normalizar
+const schAuthor = new schema.Entity('author',{}, {idAttribute:'id'});
+const schMensaje = new schema.Entity('post', {author: schAuthor}, {idAttribute: 'id'});
+const schMensajes = new schema.Entity('posts', {mensajes: [schMensaje] }, {idAttribute: 'id'});
+
+const normalizrMensajes = (msjsId) => normalize(msjsId, schMensajes);
 
 /******Middleware******/
 app.use(express.urlencoded({extended:true}));
@@ -46,22 +56,22 @@ app.get('/api/productos-test', (req,res)=>{
     res.render('main', {test:true , api:productos})
 });
 
+/******Web Socket******/
+//Chat
+io.on('connection', async (socket)=>{
+    const mensajes = await mensajesApi.listarAll()
+    const normalizados = normalizrMensajes({id:'mensajes', mensajes})
+    console.log(normalizados)//borrar
+    socket.emit('mensajes', normalizados);
+
+    socket.on('new-mensaje', data =>{
+        mensajesApi.guardar(data);
+        io.sockets.emit('mensajes', normalizados);
+    });
+})
+
 /******Servidor******/
 const PORT = 3000;
 const server = httpServer.listen(PORT, ()=>{
     console.log('Tu servidor esta corriendo en el puerto http://localhost:' + PORT);
 });
-
-/******Web Socket******/
-
-//Chat
-io.on('connection', async (socket)=>{
-    const chat = await mensajesApi.listarAll();
-    
-    socket.emit('mensajes',chat);
-    
-    socket.on('new-mensaje', data =>{
-        mensajesApi.guardar(data);
-        io.sockets.emit('mensajes', chat);
-    });
-})
