@@ -9,6 +9,12 @@ const schMensajes = new normalizr.schema.Entity('posts', {mensajes: [schMensaje]
 
 
 /**Chat**/
+//Mostrat % de compresion
+function renderCompresion(data){
+    const html = `<p class='fw-bold'>Compresión ${data}%</p>`
+    document.getElementById('compresion').innerHTML = html;
+}
+
 //Mostrar Chat
 function renderChat(data){
     const html = data.map((mensaje, index)=>{
@@ -26,12 +32,18 @@ function renderChat(data){
     document.getElementById('mensajes').innerHTML = html;
 }
 
-socket.on('mensajes', mensajesN =>{
-    console.log(mensajesN)
-    let mensajesD = normalizr.denormalize(mensajesN.result, schMensajes, mensajesN.entities)
-    console.log(mensajesD)
-    const html = mensajesD.mensajes;
-    console.log(html)
+socket.on('mensajes', data =>{
+    //tamaño normalizado
+    let dataSize = JSON.stringify(data).length;
+    //datos denormalizados 
+    let dataDenorm = normalizr.denormalize(data.result, schMensajes, data.entities);
+    //tamaño desnormalizado aka
+    let dataDenormSize = JSON.stringify(dataDenorm).length;
+    //calculo % de compresion
+    let porcentaje = parseInt((dataSize * 100) / dataDenormSize);
+
+    const html = dataDenorm.mensajes;
+    renderCompresion(porcentaje)
     renderChat(html)
 } )
 

@@ -10,7 +10,6 @@ const apiProductos = new ProductoMock();
 import { ProductoMock } from './src/mocks/producto.mock.js';
 import { mensajesDao as mensajesApi } from './src/dao/index.js';
 import { schema, normalize } from 'normalizr'
-//import util from 'util';//borrar
 
 //Solucion a __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -61,7 +60,6 @@ app.get('/api/productos-test', (req,res)=>{
 io.on('connection', async (socket)=>{
     const mensajes = await mensajesApi.listarAll()
     const normalizados = normalizrMensajes({id:'mensajes', mensajes})
-    console.log(normalizados)//borrar
     socket.emit('mensajes', normalizados);
 
     socket.on('new-mensaje', data =>{
