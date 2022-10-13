@@ -1,8 +1,8 @@
     <div class="container container-layout my-5">
         <h3 class="container mt-3 mb-3">Iniciar Sesión</h3>
         <div class="container">
-            <form onsubmit="return addMsg(this)">
-                <input class="form-control my-2" type="text" id="nombre" placeholder="Nombre de Usuario" required>
+            <form action="/login" method="post">
+                <input class="form-control my-2" type="text" name="usuario" placeholder="Nombre de Usuario" required>
                 <div class="d-flex flex-row-reverse">
                     <button class="btn btn-primary my-2">LOGIN</button>
                 </div>
