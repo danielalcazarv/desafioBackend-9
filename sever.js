@@ -32,6 +32,7 @@ const normalizrMensajes = (msjsId) => normalize(msjsId, schMensajes);
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('./public'));
 app.use('/api', express.static('./public'));
+app.use('/login', express.static('./public'));
 app.use(morgan('dev'));
 
 //Motores de plantillas
@@ -55,6 +56,10 @@ app.get('/api/productos-test', (req,res)=>{
     res.render('main', {test:true , api:productos})
 });
 
+app.get('/login', (req,res)=>{
+    res.render('login.hbs')
+})
+
 /******Web Socket******/
 //Chat
 io.on('connection', async (socket)=>{
@@ -69,7 +74,7 @@ io.on('connection', async (socket)=>{
 })
 
 /******Servidor******/
-const PORT = 8080;
+const PORT = process.env.PORT;
 const server = httpServer.listen(PORT, ()=>{
     console.log('Tu servidor esta corriendo en el puerto http://localhost:' + PORT);
 });

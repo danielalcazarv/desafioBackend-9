@@ -1,9 +1,15 @@
-{{#if test}}
-    <div class="container container-layout my-5">
-        {{>productos}}
-    </div>
+{{#if logged}}
+    {{#if test}}
+        <div class="container container-layout my-5">
+            {{>productos}}
+        </div>
+    {{else}}
+        <div class="container container-layout my-5">
+            {{>chat}}
+        </div>
+    {{/if}}
 {{else}}
     <div class="container container-layout my-5">
-        {{>chat}}
+        {{>logout}}
     </div>
 {{/if}}
