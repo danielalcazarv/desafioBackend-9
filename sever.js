@@ -75,17 +75,17 @@ app.set('views','./src/views');
 /******Rutas******/
 app.get('/', auth, (req,res)=>{
     const usuario = req.session.user;
-    res.render('main', {test:false, firstname: usuario})
+    res.render('main', {test:false, firstname: usuario});
 });
 
 app.get('/api/productos-test', auth, (req,res)=>{
-    const productos = apiProductos.almacenar(apiProductos.generarProducto())
+    const productos = apiProductos.almacenar(apiProductos.generarProducto());
     const usuario = req.session.user;
-    res.render('main', {test:true , api:productos, firstname: usuario})
+    res.render('main', {test:true , api:productos, firstname: usuario});
 });
 
 app.get('/login', (req,res)=>{
-    res.render('login.hbs')
+    res.render('login');
 });
 
 app.post('/login', (req,res)=>{
@@ -101,7 +101,7 @@ app.get('/logout', (req,res)=>{
             res.json({err});
         }else{
             res.render('logout.hbs', {firstname: usuario})
-        }
+        };
     })
 });
 
@@ -116,7 +116,7 @@ io.on('connection', async (socket)=>{
         mensajesApi.guardar(data);
         io.sockets.emit('mensajes', normalizados);
     });
-})
+});
 
 /******Servidor******/
 const PORT = process.env.PORT;
