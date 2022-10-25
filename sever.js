@@ -84,6 +84,7 @@ app.get('/api/productos-test', auth, (req,res)=>{
     res.render('main', {test:true , api:productos, firstname: usuario});
 });
 
+//Rutas de login y registro
 app.get('/login', (req,res)=>{
     res.render('login');
 });
@@ -92,6 +93,15 @@ app.post('/login', (req,res)=>{
     const userName = req.body.usuario;
     req.session.user = userName;
     res.redirect('/');
+});
+
+app.get('/registro', (req,res)=>{
+    res.render('registro');
+});
+
+app.post('/registro', (req,res)=>{
+    //aca tiene q ir los metodos para validar el registro
+    res.redirect('/login');
 });
 
 app.get('/logout', (req,res)=>{
@@ -109,6 +119,7 @@ app.get('/logout', (req,res)=>{
 //Chat
 io.on('connection', async (socket)=>{
     const mensajes = await mensajesApi.listarAll()
+    console.log(mensajes)
     const normalizados = normalizrMensajes({id:'mensajes', mensajes})
     socket.emit('mensajes', normalizados);
 
