@@ -8,12 +8,20 @@ import morgan from 'morgan';
 import handlebars from 'express-handlebars';
 const apiProductos = new ProductoMock();
 import { ProductoMock } from './src/mocks/producto.mock.js';
-import { mensajesDao as mensajesApi } from './src/dao/index.js';
+import { 
+        mensajesDao as mensajesApi,
+        usuariosDao as usuariosApi
+    } from './src/dao/index.js';
 import { schema, normalize } from 'normalizr'
 import session from "express-session";
 import connectMongo from 'connect-mongo';
+import bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
 dotenv.config();
+
+import passport from "passport";
+import { Strategy } from "passport-local";
+const LocalStrategy = Strategy;
 
 //Persistencia session MongoDb Atlas
 const MongoStore = connectMongo.create({
@@ -45,7 +53,35 @@ app.use('/api', express.static('./public'));
 app.use('/login', express.static('./public'));
 app.use(morgan('dev'));
 
-//Session Setup
+//Passport
+passport.use( new LocalStrategy(
+    async function (username, password, done){
+        const usuariosDb = await usuariosApi.listarAll()
+        const existeUsuario = usuariosDb.find(x=>x.username == username);
+        
+        if (!existeUsuario) {
+            return done(null, false);
+        } else {
+            const match = await verifyPass(existeUsuario, password);
+            if (!match){
+                return done(null, false);
+            }
+            return done(null, existeUsuario);
+        }
+    }
+));
+
+passport.serializeUser((usuario, done)=>{
+    done(null, usuario.username);
+});
+
+passport.deserializeUser(async (username, done)=>{
+    const usuariosDb = await usuariosApi.listarAll()
+    const existeUsuario = usuariosDb.find(x=>x.username == username);
+    done(null, existeUsuario);
+});
+
+//Session Setup Mongo Atlas
 app.use(session({
     store:MongoStore,
     secret: process.env.SECRET_KEY,
@@ -54,12 +90,28 @@ app.use(session({
 }));
 
 //Session Auth
-function auth (req, res, next) {
-    if (req.session.user){
-        return next()
+function auth(req, res, next) {
+    if(req.isAuthenticated()){
+        next()
+    } else {
+        res.redirect('/login')
     }
-    return res.render('forbidden.hbs')
-}
+};
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+//Métodos de Auth
+async function generateHashPassword(password){
+    const hashPassword = await bcrypt.hash(password, 10);
+    return hashPassword;
+};
+
+async function verifyPass(usuario, password) {
+    const match = await bcrypt.compare(password, usuario.password);
+    return match;
+};
+
 
 //Motores de plantillas
 //HBS
@@ -74,13 +126,13 @@ app.set('views','./src/views');
 
 /******Rutas******/
 app.get('/', auth, (req,res)=>{
-    const usuario = req.session.user;
+    const usuario = req.user.nombre;
     res.render('main', {test:false, firstname: usuario});
 });
 
 app.get('/api/productos-test', auth, (req,res)=>{
     const productos = apiProductos.almacenar(apiProductos.generarProducto());
-    const usuario = req.session.user;
+    const usuario = req.user.nombre;
     res.render('main', {test:true , api:productos, firstname: usuario});
 });
 
@@ -89,29 +141,38 @@ app.get('/login', (req,res)=>{
     res.render('login');
 });
 
-app.post('/login', (req,res)=>{
-    const userName = req.body.usuario;
-    req.session.user = userName;
-    res.redirect('/');
+app.get('/login-error', (req,res)=>{
+    res.render('login-error');
 });
+
+app.post('/login', passport.authenticate('local',  {successRedirect: '/', failureRedirect: '/login-error'}, ));
 
 app.get('/registro', (req,res)=>{
     res.render('registro');
 });
 
-app.post('/registro', (req,res)=>{
-    //aca tiene q ir los metodos para validar el registro
-    res.redirect('/login');
+app.get('/registro-error', (req,res)=>{
+    res.render('registro-error');
 });
 
-app.get('/logout', (req,res)=>{
-    const usuario = req.session.user;
-    req.session.destroy(err=>{
-        if (err){
-            res.json({err});
-        }else{
-            res.render('logout.hbs', {firstname: usuario})
-        };
+app.post('/registro', async (req,res)=>{
+    const { username, password, nombre, telefono } = req.body;
+    const usuariosDb = await usuariosApi.listarAll();
+    const existeUsuario = usuariosDb.find(x=>x.username == username);
+
+    if(existeUsuario){
+        res.render('registro-error')
+    }else {
+        const usuarioNuevo = {username, password: await generateHashPassword(password), nombre, telefono};
+        usuariosApi.guardar(usuarioNuevo);
+        res.redirect('/login');
+    }
+});
+
+app.get('/logout', (req, res)=> {
+    const usuario = req.user.nombre;
+    req.logOut(err => {
+        res.render('logout.hbs', {firstname: usuario})
     })
 });
 
@@ -119,7 +180,6 @@ app.get('/logout', (req,res)=>{
 //Chat
 io.on('connection', async (socket)=>{
     const mensajes = await mensajesApi.listarAll()
-    console.log(mensajes)
     const normalizados = normalizrMensajes({id:'mensajes', mensajes})
     socket.emit('mensajes', normalizados);
 
