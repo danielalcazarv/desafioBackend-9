@@ -127,13 +127,15 @@ app.set('views','./src/views');
 /******Rutas******/
 app.get('/', auth, (req,res)=>{
     const usuario = req.user.nombre;
-    res.render('main', {test:false, firstname: usuario});
+    const email = req.user.username;
+    res.render('main', {test:false, firstname: usuario, correo:email});
 });
 
 app.get('/api/productos-test', auth, (req,res)=>{
     const productos = apiProductos.almacenar(apiProductos.generarProducto());
     const usuario = req.user.nombre;
-    res.render('main', {test:true , api:productos, firstname: usuario});
+    const email = req.user.username;
+    res.render('main', {test:true , api:productos, firstname: usuario, correo:email});
 });
 
 //Rutas de login y registro
