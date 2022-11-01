@@ -139,6 +139,20 @@ app.get('/api/productos-test', auth, (req,res)=>{
     res.render('main', {test:true , api:productos, firstname: usuario, correo:email});
 });
 
+//Info
+app.get('/info', (req,res)=>{
+    const objInfo = {
+        "ARG_INPUT": minimist(process.argv.slice(2)),
+        "OS": process.platform,
+        "NODE_VER": process.version,
+        "RSS": process.memoryUsage().rss,
+        "EXEC_PATH": process.execPath,
+        "PROCESS_ID": process.pid,
+        "PROJECT_FOLDER": process.cwd()
+    }
+    res.status(200).json(objInfo);
+})
+
 //Rutas de login y registro
 app.get('/login', (req,res)=>{
     res.render('login');
