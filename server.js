@@ -16,6 +16,7 @@ import { schema, normalize } from 'normalizr'
 import session from "express-session";
 import connectMongo from 'connect-mongo';
 import bcrypt from 'bcrypt';
+import minimist from 'minimist';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -192,7 +193,9 @@ io.on('connection', async (socket)=>{
 });
 
 /******Servidor******/
-const PORT = process.env.PORT;
+let options = {default: {puerto:8080}, alias: {modo: 'm', p: 'puerto', d:'debug'}};
+let args = minimist(process.argv.slice(2), options);
+const PORT = args.p;
 const server = httpServer.listen(PORT, ()=>{
     console.log('Tu servidor esta corriendo en el puerto http://localhost:' + PORT);
 });
