@@ -38,6 +38,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const httpServer = createServer(app);
 const io = new Server (httpServer);
+import routerRandoms from './src/routes/randoms.routes.js';
 
 /****Normalizr*****/
 //Normalizar
@@ -139,6 +140,9 @@ app.get('/api/productos-test', auth, (req,res)=>{
     res.render('main', {test:true , api:productos, firstname: usuario, correo:email});
 });
 
+//calculo Randoms
+app.use('/api/randoms', routerRandoms);
+
 //Info
 app.get('/info', (req,res)=>{
     const objInfo = {
@@ -151,7 +155,7 @@ app.get('/info', (req,res)=>{
         "PROJECT_FOLDER": process.cwd()
     }
     res.status(200).json(objInfo);
-})
+});
 
 //Rutas de login y registro
 app.get('/login', (req,res)=>{
