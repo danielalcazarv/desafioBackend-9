@@ -1,4 +1,4 @@
-export function randomNumberGenerator(number){
+function randomNumberGenerator(number){
     const numbersArray = [];
     const numbersObj = {};
 
@@ -24,4 +24,4 @@ process.on('message', msg=> {
     console.log(msg)
     const objRender = randomNumberGenerator(msg);
     process.send(objRender)
-})
+});

@@ -11,7 +11,7 @@ let valor;
 //Valida si se ingresa query
 async function validaQuery (req, res, next){
     if (req.query.cant == undefined){
-        valor = 1e9;
+        valor = 1e8;
     }else{
         valor=Number(req.query.cant);
     }
@@ -43,9 +43,9 @@ async function notZero (req, res, next){
 }
 
 /******Rutas******/
+//Solucionado a 1e8 -> a  5e8 sigue crasheando el calculo pero no bloquea (funciona como debería?)
 routerRandoms.get('/', validaQuery, validaTypeNumber, notZero, async (req, res)=>{
     const queryNumber = valor;
-    //forkedProcess.send('Iniciar');
     forkedProcess.send(queryNumber);
     forkedProcess.on('message', resultado =>{
         console.log('El resultado es:')
