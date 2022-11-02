@@ -1,6 +1,7 @@
 /******Modulos******/
 import express from 'express';
 import { fork } from 'child_process';
+import { randomBytes } from 'crypto';
 const routerRandoms = express.Router();
 const forkedProcess = fork('./calculo-random.js')
 
@@ -43,9 +44,14 @@ async function notZero (req, res, next){
 
 /******Rutas******/
 routerRandoms.get('/', validaQuery, validaTypeNumber, notZero, async (req, res)=>{
-    const unaQuery = valor;
-
-    res.status(200).send('el valor del query: '+unaQuery)
+    const queryNumber = valor;
+    //forkedProcess.send('Iniciar');
+    forkedProcess.send(queryNumber);
+    forkedProcess.on('message', resultado =>{
+        console.log('El resultado es:')
+        console.log(resultado)
+    })
+    res.status(200).send('esperando proceso secundario')
 });
 
 
