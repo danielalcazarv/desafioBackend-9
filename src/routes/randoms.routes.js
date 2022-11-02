@@ -1,6 +1,8 @@
+/******Modulos******/
 import express from 'express';
-
+import { fork } from 'child_process';
 const routerRandoms = express.Router();
+const forkedProcess = fork('./calculo-random.js')
 
 /******Middleware******/
 let valor;
