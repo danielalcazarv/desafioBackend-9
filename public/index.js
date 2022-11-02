@@ -76,3 +76,14 @@ function addMsg(e){
     msjInput.value='';
     return false;
 }
+
+/**Calculo**/
+//Mostrar Resultado
+function renderResult(data){
+    const html = JSON.stringify(data);
+    document.getElementById('resultados').innerHTML = html;
+}
+
+socket.on('randoms', data=>{
+    renderResult(data);
+});

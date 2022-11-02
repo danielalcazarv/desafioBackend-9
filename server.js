@@ -54,6 +54,10 @@ app.use(express.static('./public'));
 app.use('/api', express.static('./public'));
 app.use('/login', express.static('./public'));
 app.use(morgan('dev'));
+app.use((req, res, next) => { //permite el uso de socket io en Routes
+    req.io = io;
+    return next();
+});
 
 //Passport
 passport.use( new LocalStrategy(

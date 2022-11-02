@@ -1,9 +1,9 @@
 /******Modulos******/
 import express from 'express';
 import { fork } from 'child_process';
-import { randomBytes } from 'crypto';
+
 const routerRandoms = express.Router();
-const forkedProcess = fork('./calculo-random.js')
+const forkedProcess = fork('./calculo-random.js');
 
 /******Middleware******/
 let valor;
@@ -43,17 +43,18 @@ async function notZero (req, res, next){
 }
 
 /******Rutas******/
-//Solucionado a 1e8 -> a  5e8 sigue crasheando el calculo pero no bloquea (funciona como debería?)
+//Solucionado a 1e8 -> a  5e8 sigue crasheando el calculo pero no bloquea (funciona como debería????)
 routerRandoms.get('/', validaQuery, validaTypeNumber, notZero, async (req, res)=>{
     const queryNumber = valor;
     forkedProcess.send(queryNumber);
     forkedProcess.on('message', resultado =>{
-        console.log('El resultado es:')
-        console.log(resultado)
+    //Web Socket -> Mostrar Cálculo
+        req.io.on('connection', async (socket)=>{
+        socket.emit('randoms', resultado);
+        });
     })
-    res.status(200).send('esperando proceso secundario')
+    res.render('api-randoms')
 });
-
 
 
 export default routerRandoms;
