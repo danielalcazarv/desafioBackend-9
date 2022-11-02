@@ -80,7 +80,7 @@ function addMsg(e){
 /**Calculo**/
 //Mostrar Resultado
 function renderResult(data){
-    const html = JSON.stringify(data);
+    const html = JSON.stringify(data, null, 4);
     document.getElementById('resultados').innerHTML = html;
 }
 

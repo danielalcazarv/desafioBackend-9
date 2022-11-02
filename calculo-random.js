@@ -23,5 +23,5 @@ process.on('message', msg=> {
     console.log('procesando request en plano secundario');
     console.log(msg)
     const objRender = randomNumberGenerator(msg);
-    process.send(objRender)
+    process.send(objRender);
 });
