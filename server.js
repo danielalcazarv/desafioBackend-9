@@ -17,6 +17,8 @@ import session from "express-session";
 import connectMongo from 'connect-mongo';
 import bcrypt from 'bcrypt';
 import minimist from 'minimist';
+import cluster from 'cluster';
+import os from 'os';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -39,6 +41,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server (httpServer);
 import routerRandoms from './src/routes/randoms.routes.js';
+const CPU_CORES = os.cpus().length;
 
 /****Normalizr*****/
 //Normalizar
@@ -156,7 +159,8 @@ app.get('/info', (req,res)=>{
         "RSS": process.memoryUsage().rss,
         "EXEC_PATH": process.execPath,
         "PROCESS_ID": process.pid,
-        "PROJECT_FOLDER": process.cwd()
+        "PROJECT_FOLDER": process.cwd(),
+        "CPU_CORES": CPU_CORES
     }
     res.status(200).json(objInfo);
 });
@@ -215,9 +219,29 @@ io.on('connection', async (socket)=>{
 });
 
 /******Servidor******/
-let options = {default: {puerto:8080}, alias: {modo: 'm', p: 'puerto', d:'debug'}};
+let options = {default: {puerto:8080, modo: 'FORK'}, alias: {modo: 'm', p: 'puerto', d:'debug'}};
 let args = minimist(process.argv.slice(2), options);
 const PORT = args.p;
-const server = httpServer.listen(PORT, ()=>{
-    console.log('Tu servidor esta corriendo en el puerto http://localhost:' + PORT);
-});
+
+if (cluster.isPrimary) {
+    console.log('Cant de cores: ', CPU_CORES);
+    console.log(args.m)
+    
+    for (let i = 0; i < CPU_CORES; i++) {
+        cluster.fork();
+    }
+
+    cluster.on('exit', worker => {
+        console.log(`Worker ${process.pid} ${worker.id} ${worker.pid} finalizo ${new Date().toLocaleString()}`);
+        cluster.fork();
+    });
+
+} else {
+    const PORT = parseInt(process.argv[2]) || 8080;
+    const server = httpServer.listen(PORT, ()=>{
+        console.log( `Tu servidor esta corriendo en el puerto http://localhost: ${PORT} - PID WORKER ${process.pid}`);
+    });
+}
+
+
+
