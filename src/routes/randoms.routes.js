@@ -1,6 +1,7 @@
 /******Modulos******/
 import express from 'express';
 import { fork } from 'child_process';
+import { logger } from "../utils/log/logger.config.js";
 
 const routerRandoms = express.Router();
 const forkedProcess = fork('./calculo-random.js');
@@ -12,8 +13,10 @@ let valor;
 async function validaQuery (req, res, next){
     if (req.query.cant == undefined){
         valor = 1e8;
+        logger.info(`Cantidad de números procesados ${valor}`);
     }else{
         valor=Number(req.query.cant);
+        logger.info(`Cantidad de números procesados ${valor}`);
     }
     next();
 };
@@ -26,6 +29,7 @@ async function validaTypeNumber (req, res, next){
         const msj = {
             error:400,
             descripcion:`Bad request. Query no es un número. Ruta: ${req.baseUrl}/${req.query.cant} || Método: ${req.method}`};
+        logger.error(`Parámetro ingresado no es un número. Parámetro ingresado:${req.query.cant} `);
         res.status(400).json(msj);
     }
 };
@@ -38,6 +42,7 @@ async function notZero (req, res, next){
         const msj = {
             error:400,
             descripcion:`Bad request. Número ingresado debe ser mayor a cero. Ruta: ${req.baseUrl}/${req.query.cant} || Método: ${req.method}`};
+            logger.error(`Número ingresado debe ser mayor a cero. Parámetro ingresado:${req.query.cant}`);
         res.status(400).json(msj);
     }
 }

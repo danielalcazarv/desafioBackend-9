@@ -21,6 +21,7 @@ import cluster from 'cluster';
 import os from 'os';
 import * as dotenv from 'dotenv';
 import compression from 'compression';
+import { logger } from "./src/utils/log/logger.config.js";
 dotenv.config();
 
 import passport from "passport";
@@ -55,7 +56,7 @@ const normalizrMensajes = (msjsId) => normalize(msjsId, schMensajes);
 /******Middlewares******/
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('./public'));
-app.use('/api', express.static('./public'));
+app.use('/api/randoms', express.static('./public'));
 app.use('/login', express.static('./public'));
 app.use(morgan('dev'));
 app.use((req, res, next) => { //permite el uso de socket io en Routes
@@ -220,6 +221,21 @@ app.get('/logout', (req, res)=> {
     })
 });
 
+//Errores globales
+app.use(function(err,req,res,next){
+    logger.error(err.stack);
+    res.status(err.status || 500).send({error: "Algo se rompió"})
+});
+
+app.use(function(req,res,next){
+    const msj ={
+        error: 404,
+        descripcion:`Not found. Ruta: ${req.baseUrl}${req.url} || Método: ${req.method} No implementada.`
+    };
+    logger.warn(`Not found. Ruta: ${req.baseUrl}${req.url} || Método: ${req.method} No implementada.`)
+    res.status(404).send(msj)
+});
+
 /******Web Socket******/
 //Chat
 io.on('connection', async (socket)=>{
@@ -239,22 +255,23 @@ let args = minimist(process.argv.slice(2), options);
 const PORT = args.p;
 
 if (cluster.isPrimary) {
-    console.log('Cant de cores: ', CPU_CORES);
+    logger.info('Cant de cores: ', CPU_CORES);
     
     for (let i = 0; i < CPU_CORES; i++) {
         cluster.fork();
     }
 
     cluster.on('exit', worker => {
-        console.log(`Worker ${process.pid} ${worker.id} ${worker.pid} finalizo ${new Date().toLocaleString()}`);
+        logger.info(`Worker ${process.pid} ${worker.id} ${worker.pid} finalizo ${new Date().toLocaleString()}`);
         cluster.fork();
     });
 
 } else {
     const PORT = parseInt(process.argv[2]) || 8080;
     const server = httpServer.listen(PORT, ()=>{
-        console.log( `Tu servidor esta corriendo en el puerto http://localhost: ${PORT} - PID WORKER ${process.pid}`);
+        logger.info( `Tu servidor esta corriendo en el puerto http://localhost: ${PORT} - PID WORKER ${process.pid}`);
     });
+    server.on('error', error => logger.error(`Error en servidor: ${error}`))
 }
 
 
