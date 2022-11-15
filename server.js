@@ -20,6 +20,7 @@ import minimist from 'minimist';
 import cluster from 'cluster';
 import os from 'os';
 import * as dotenv from 'dotenv';
+import compression from 'compression';
 dotenv.config();
 
 import passport from "passport";
@@ -165,6 +166,20 @@ app.get('/info', (req,res)=>{
     res.status(200).json(objInfo);
 });
 
+app.get('/info-gzip',compression(), (req,res)=>{
+    const objInfo = {
+        "ARG_INPUT": minimist(process.argv.slice(2)),
+        "OS": process.platform,
+        "NODE_VER": process.version,
+        "RSS": process.memoryUsage().rss,
+        "EXEC_PATH": process.execPath,
+        "PROCESS_ID": process.pid,
+        "PROJECT_FOLDER": process.cwd(),
+        "CPU_CORES": CPU_CORES
+    }
+    res.status(200).json(objInfo);
+});
+
 //Rutas de login y registro
 app.get('/login', (req,res)=>{
     res.render('login');
@@ -225,7 +240,6 @@ const PORT = args.p;
 
 if (cluster.isPrimary) {
     console.log('Cant de cores: ', CPU_CORES);
-    console.log(args.m)
     
     for (let i = 0; i < CPU_CORES; i++) {
         cluster.fork();
