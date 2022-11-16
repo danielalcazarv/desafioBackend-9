@@ -178,6 +178,7 @@ app.get('/info-gzip',compression(), (req,res)=>{
         "PROJECT_FOLDER": process.cwd(),
         "CPU_CORES": CPU_CORES
     }
+    //console.log(objInfo.ARG_INPUT);//prueba
     res.status(200).json(objInfo);
 });
 
@@ -252,8 +253,8 @@ io.on('connection', async (socket)=>{
 /******Servidor******/
 let options = {default: {puerto:8080, modo: 'FORK'}, alias: {modo: 'm', p: 'puerto', d:'debug'}};
 let args = minimist(process.argv.slice(2), options);
-const PORT = args.p;
 
+/*//CLUSTER
 if (cluster.isPrimary) {
     logger.info('Cant de cores: ', CPU_CORES);
     
@@ -272,7 +273,21 @@ if (cluster.isPrimary) {
         logger.info( `Tu servidor esta corriendo en el puerto http://localhost: ${PORT} - PID WORKER ${process.pid}`);
     });
     server.on('error', error => logger.error(`Error en servidor: ${error}`))
-}
+}*/
 
+//FORK
+const PORT = parseInt(process.argv[2]) || 8080;
+const server = httpServer.listen(PORT, ()=>{
+    logger.info( `Tu servidor esta corriendo en el puerto http://localhost: ${PORT} - PID WORKER ${process.pid}`);
+});
+server.on('error', error => logger.error(`Error en servidor: ${error}`))
 
+//con console.log
+// artillery quick --count 50 -n 20 "http://localhost:8080/info-gzip" > console_si.txt
 
+//con console.log
+// artillery quick --count 50 -n 20 "http://localhost:8080/info-gzip" > console_no.txt
+
+//Para desencriptar los archivos resultados v8
+//node --prof-process console_si-v8.log > result_console_si.txt
+//node --prof-process console_no-v8.log > result_console_no.txt
