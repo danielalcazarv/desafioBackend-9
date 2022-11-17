@@ -153,7 +153,7 @@ app.get('/api/productos-test', auth, (req,res)=>{
 app.use('/api/randoms', routerRandoms);
 
 //Info
-app.get('/info', (req,res)=>{
+app.get('/info', compression(), (req,res)=>{
     const objInfo = {
         "ARG_INPUT": minimist(process.argv.slice(2)),
         "OS": process.platform,
@@ -178,7 +178,7 @@ app.get('/info-gzip',compression(), (req,res)=>{
         "PROJECT_FOLDER": process.cwd(),
         "CPU_CORES": CPU_CORES
     }
-    //console.log(objInfo.ARG_INPUT);//prueba
+    console.log(objInfo.ARG_INPUT);//prueba
     res.status(200).json(objInfo);
 });
 
@@ -285,8 +285,8 @@ server.on('error', error => logger.error(`Error en servidor: ${error}`))
 //con console.log
 // artillery quick --count 50 -n 20 "http://localhost:8080/info-gzip" > console_si.txt
 
-//con console.log
-// artillery quick --count 50 -n 20 "http://localhost:8080/info-gzip" > console_no.txt
+//sin console.log
+// artillery quick --count 50 -n 20 "http://localhost:8080/info" > console_no.txt
 
 //Para desencriptar los archivos resultados v8
 //node --prof-process console_si-v8.log > result_console_si.txt
