@@ -2,3 +2,6 @@
 [2022-11-15T01:40:15.761] [WARN] default - Not found. Ruta: /api/raadafsas || Método: GET No implementada.
 [2022-11-15T01:52:13.165] [WARN] default - Not found. Ruta: /api/randoms/style.css || Método: GET No implementada.
 [2022-11-15T01:52:13.501] [WARN] default - Not found. Ruta: /api/randoms/index.js || Método: GET No implementada.
+[2022-11-23T22:47:19.279] [ERROR] default - Error en servidor: Error: listen EADDRINUSE: address already in use :::8080
+[2022-11-23T22:48:28.545] [WARN] default - Not found. Ruta: /api/index.js || Método: GET No implementada.
+[2022-11-23T22:48:28.752] [WARN] default - Not found. Ruta: /api/style.css || Método: GET No implementada.
